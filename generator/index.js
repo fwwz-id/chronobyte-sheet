@@ -6,5 +6,5 @@ const generator = new Generator();
 const JSONwrite = new JSONWriter(generator);
 JSONwrite.writeAll();
 
-new PoolWriter();
-
+const poolWrite = new PoolWriter();
+poolWrite.run();

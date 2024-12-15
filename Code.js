@@ -7,6 +7,7 @@ function main() {
   setEmployees(spreadsheet);
   setProjectAssignments(spreadsheet);
   setTasks(spreadsheet);
+  setFeedbacks(spreadsheet);
 }
 
 /**
@@ -91,12 +92,16 @@ function setTasks(spreadsheet) {
   const sheet = spreadsheet.getSheetByName("Tasks");
   const values = [];
 
+  /** @type {Array<{project_id: string, tasks: import("./generator/definition").TaskEntity[]}>} */
   const tasks = TASKS_POOL;
 
   tasks.forEach(task => {
-    const { id, project_id, name, description, start_date, end_date, status, created_at, updated_at } = task;
+    task.tasks.forEach(t => {
+      const { id, description, assigned_to, status, priority, start_date, due_date, created_at, updated_at } = t;
 
-    values.push([id, project_id, name, description, start_date, end_date, status, created_at, updated_at]);
+      values.push([id, task.project_id, description, assigned_to, status, priority, start_date, due_date, created_at, updated_at]);
+    })
+
   });
 
   inject(sheet, values);
@@ -112,6 +117,21 @@ function setProjectAssignments(spreadsheet) {
     const { id, project_id, employee_id, assigned_date, unassigned_date, created_at, updated_at } = assignment;
 
     values.push([id, project_id, employee_id, assigned_date, unassigned_date, created_at, updated_at]);
+  });
+
+  inject(sheet, values);
+}
+
+function setFeedbacks(spreadsheet) {
+  const sheet = spreadsheet.getSheetByName("Feedbacks");
+  const values = [];
+
+  const feedbacks = FEEDBACKS_POOL;
+
+  feedbacks.forEach(feedback => {
+    const { id, client_id, project_id, rating, comment, created_at, updated_at } = feedback;
+
+    values.push([id, client_id, project_id, rating, comment, created_at, updated_at]);
   });
 
   inject(sheet, values);

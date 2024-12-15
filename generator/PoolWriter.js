@@ -10,12 +10,6 @@ module.exports = class PoolWriter {
 
     ignores = ['companies-only.json', 'projects.json'];
 
-    constructor() {
-        this.getFilenames();
-        this.write();
-        this.cp();
-    }
-
     getFilenames() {
         fs.readdirSync(JSONDir).forEach(file => {
             if (!this.ignores.includes(file)) {
@@ -40,6 +34,12 @@ module.exports = class PoolWriter {
         this.filenames.forEach(filename => {
             fs.copyFileSync(`${targetDir}${filename.replace('.json', '.js')}`, path.join(__dirname, '..', filename.replace('.json', '.js')));
         });
+    }
+
+    run() {
+        this.getFilenames();
+        this.write();
+        this.cp();
     }
 
     macroCase(str) {

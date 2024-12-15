@@ -19,6 +19,8 @@ module.exports = class JSONWriter {
         this.roles = this.generator.getRoles();
         this.employees = this.generator.getEmployees(this.roles);
         this.projectAssignments = this.generator.getProjectAssignments(this.employees, this.projects, this.roles);
+        this.tasks = this.generator.getTasks(this.projectAssignments, this.projects);
+        this.feedbacks = this.generator.getFeedbacks(this.projects);
     }
 
     writeAll() {
@@ -29,6 +31,7 @@ module.exports = class JSONWriter {
         this.writeEmployees();
         this.writeProjectAssignments();
         this.writeTasks();
+        this.writeFeedbacks();
     }
 
     writeCompleteCompanies() {
@@ -63,8 +66,14 @@ module.exports = class JSONWriter {
     }
 
     writeTasks(){
-        const tasks = this.generator.getTasks(this.projectAssignments, this.projects);
+        const tasks = this.tasks;
 
         fs.writeFileSync(filepath("tasks.json"), JSON.stringify(tasks, null, 2));
+    }
+
+    writeFeedbacks(){
+        const feedbacks = this.feedbacks;
+
+        fs.writeFileSync(filepath("feedbacks.json"), JSON.stringify(feedbacks, null, 2));
     }
 }

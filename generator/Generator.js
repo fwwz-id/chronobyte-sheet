@@ -4,6 +4,7 @@ const COMPANY_POOL = require("./templates/company");
 const { PROJECTS_POOL, PRIORITIES } = require("./templates/project");
 const { ROLES } = require("./templates/role");
 const { TASK_POOL } = require("./templates/task");
+const { FEEDBACK_POOL } = require("./templates/feedback");
 
 // const INDUSTRY_POOL = ["Healthcare", "Finance", "Technology", "Energy", "Marketing", "Transportation", "Retail", "Aerospace", "Education"]
 
@@ -185,7 +186,7 @@ module.exports = class Generator {
      */
     getTasks(assignments, projects) {
         const TASK_STATUSES = ["Not Started", "In Progress"];
-        
+
         /** @type {Array<{project_id: string, tasks: import("./definition").TaskEntity[]}>} */
         const tasks_each_project = [];
 
@@ -243,5 +244,38 @@ module.exports = class Generator {
         });
 
         return tasks_each_project;
+    }
+
+    /**
+     * 
+     * @param {import("./definition").Project[]} projects 
+     */
+    getFeedbacks(projects) {
+        const completed = projects.filter(project => project.status === "Completed");
+
+        const fiveRatings = FEEDBACK_POOL.filter(feedback => feedback.rating === 5);
+        const fourRatings = FEEDBACK_POOL.filter(feedback => feedback.rating === 4);
+        const threeRatings = FEEDBACK_POOL.filter(feedback => feedback.rating === 3);
+
+        const ratings = [
+            { weight: 5, value: fiveRatings },
+            { weight: 4, value: fourRatings },
+            { weight: 3, value: threeRatings },
+        ];
+
+        return completed.map(project => {
+            const reviews = faker.helpers.weightedArrayElement(ratings);
+            const review = faker.helpers.arrayElement(reviews);
+
+            return {
+                id: faker.string.uuid(),
+                client_id: project.company_id,
+                project_id: project.id,
+                rating: review.rating,
+                comment: review.comment,
+                created_at: project.end_date,
+                updated_at: project.end_date,
+            }
+        });
     }
 }
